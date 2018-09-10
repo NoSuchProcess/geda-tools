@@ -219,7 +219,7 @@ void fixup_line(line_t *line)
     if (line->linewidth >= THICK_LINE_WIDTH) {
         line->linewidth = THICK_LINE_WIDTH;
     }
-    if (line->x1 > line->x2 || (line->x1 == line->x2 && line->y1 > line->y2)) {
+    if (line->capstyle != 3 && (line->x1 > line->x2 || (line->x1 == line->x2 && line->y1 > line->y2))) {
         int tmp;
         tmp = line->x1;
         line->x1 = line->x2;
@@ -1009,7 +1009,7 @@ int main(/*int argc, char *argv[], char *envp[]*/)
     image_y2 = ceil100(image_y2);
     off_x = symbol_x1;
     off_y = symbol_y1; /* put over the value attribute */
-
+#if 0
     if (attrs[ATTR_REFDES] == NULL) {
         attrs[ATTR_REFDES] = new_attr("refdes", "?");
     }
@@ -1052,7 +1052,7 @@ int main(/*int argc, char *argv[], char *envp[]*/)
     if (attrs[ATTR_FOOTPRINT] == NULL) {
         attrs[ATTR_FOOTPRINT] = new_attr("footprint", "?");
     }
-
+#endif
     /* remove all slot definitions if numslots=0 or undefined */
     if (attrs[ATTR_NUMSLOTS] == NULL || strcmp(attrs[ATTR_NUMSLOTS]->value, "0") == 0) {
         for (int i = ATTR_SLOTDEF_1; i <= ATTR_SLOTDEF_MAX; ++i) {
