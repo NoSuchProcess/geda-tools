@@ -219,15 +219,22 @@ void fixup_line(line_t *line)
     if (line->linewidth >= THICK_LINE_WIDTH) {
         line->linewidth = THICK_LINE_WIDTH;
     }
-    if (line->capstyle != 3 && (line->x1 > line->x2 || (line->x1 == line->x2 && line->y1 > line->y2))) {
-        int tmp;
-        tmp = line->x1;
-        line->x1 = line->x2;
-        line->x2 = tmp;
-        tmp = line->y1;
-        line->y1 = line->y2;
-        line->y2 = tmp;
+    if (line->capstyle == 3) {
+        return;
     }
+    if (line->x1 < line->x2) {
+        return;
+    }
+    if (line->y1 <= line->y2) {
+        return;
+    }
+    int tmp;
+    tmp = line->x1;
+    line->x1 = line->x2;
+    line->x2 = tmp;
+    tmp = line->y1;
+    line->y1 = line->y2;
+    line->y2 = tmp;
 }
 
 void fixup_circle(circle_t *circle)
@@ -385,6 +392,26 @@ void fixup_pin_attrs(pin_t *pin)
         pin->attr_pinseq->color = ATTRIBUTE_COLOR;
         pin->attr_pinseq->alignment = (dir > 0 ? UPPER_LEFT : UPPER_RIGHT);
     }
+}
+
+static void get_origin_from_pin(int *x_c, int *y_c)
+{
+    int x_min = 0, x_max = 0;
+    int y_min = 0, y_max = 0;
+
+    if (pin_count != 0) {
+        x_min = x_max = pins[0]->x1;
+        y_min = y_max = pins[0]->y1;
+        for (int i = 1; i < pin_count; ++i) {
+            x_min = x_min < pins[i]->x1 ? x_min : pins[i]->x1;
+            x_max = x_max > pins[i]->x1 ? x_max : pins[i]->x1;
+            y_min = y_min < pins[i]->y1 ? y_min : pins[i]->y1;
+            y_max = y_max > pins[i]->y1 ? y_max : pins[i]->y1;
+        }
+    }
+
+    *x_c = floor100((x_min + x_max) / 2);
+    *y_c = floor100((y_min + y_max) / 2);
 }
 
 /* from left_to_right */
@@ -1007,8 +1034,14 @@ int main(/*int argc, char *argv[], char *envp[]*/)
     image_y1 = floor100(image_y1);
     image_x2 = ceil100(image_x2);
     image_y2 = ceil100(image_y2);
+
+#if 0
     off_x = symbol_x1;
     off_y = symbol_y1; /* put over the value attribute */
+#else
+    get_origin_from_pin(&off_x, &off_y);
+#endif
+
 #if 0
     if (attrs[ATTR_REFDES] == NULL) {
         attrs[ATTR_REFDES] = new_attr("refdes", "?");
@@ -1092,7 +1125,7 @@ int main(/*int argc, char *argv[], char *envp[]*/)
     }
 
     /* save file */
-    fprintf(out, "v %d %d\n", 20140308, 2);
+    fprintf(out, "v %d %d\n", 20150930, 2);
     /* lines */
     for (int i = 0; i < line_count; ++i) {
         out_line(out, lines[i]);
