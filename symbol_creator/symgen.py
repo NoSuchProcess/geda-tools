@@ -37,23 +37,31 @@ def main():
             if pin.startswith('add_width='):
                 add_width = int(pin.split('=')[1])
 
-    print('v 20140308 2')
+    print('v 20150930 2')
     # | |    | |
-    print('L %d 200 %d %d 3 %d 0 0 -1 -1' % (PIN_LENGTH, PIN_LENGTH, 200 + (n + 1) * PIN_SPACE, THICK_LINE_WIDTH))
-    print('L %d 200 %d %d 3 %d 0 0 -1 -1' % (PIN_LENGTH + add_width, PIN_LENGTH + add_width, 200 + (n + 1) * PIN_SPACE, THICK_LINE_WIDTH))
-    print('L %d 200 %d %d 3 %d 0 0 -1 -1' % (PIN_LENGTH + add_width + main_width, PIN_LENGTH + add_width + main_width, 200 + (n + 1) * PIN_SPACE, THICK_LINE_WIDTH))
-    print('L %d 200 %d %d 3 %d 0 0 -1 -1' % (PIN_LENGTH + add_width + main_width + add_width, PIN_LENGTH + add_width + main_width + add_width, 200 + (n + 1) * PIN_SPACE, THICK_LINE_WIDTH))
+    print('L %d 200 %d %d 3 %d 1 0 -1 -1' % (PIN_LENGTH, PIN_LENGTH, 200 + (n + 1) * PIN_SPACE, THICK_LINE_WIDTH))
+    print('L %d 200 %d %d 3 %d 1 0 -1 -1' % (PIN_LENGTH + add_width, PIN_LENGTH + add_width, 200 + (n + 1) * PIN_SPACE, THICK_LINE_WIDTH))
+    print('L %d 200 %d %d 3 %d 1 0 -1 -1' % (PIN_LENGTH + add_width + main_width, PIN_LENGTH + add_width + main_width, 200 + (n + 1) * PIN_SPACE, THICK_LINE_WIDTH))
+    print('L %d 200 %d %d 3 %d 1 0 -1 -1' % (PIN_LENGTH + add_width + main_width + add_width, PIN_LENGTH + add_width + main_width + add_width, 200 + (n + 1) * PIN_SPACE, THICK_LINE_WIDTH))
     # ----------
-    print('L %d 200 %d 200 3 %d 0 0 -1 -1' % (PIN_LENGTH, PIN_LENGTH + add_width + main_width + add_width, THICK_LINE_WIDTH))
-    print('L %d %d %d %d 3 %d 0 0 -1 -1' % (PIN_LENGTH, 200 + (n + 1) * PIN_SPACE, PIN_LENGTH + add_width + main_width + add_width, 200 + (n + 1) * PIN_SPACE, THICK_LINE_WIDTH))
+    print('L %d 200 %d 200 3 %d 1 0 -1 -1' % (PIN_LENGTH, PIN_LENGTH + add_width + main_width + add_width, THICK_LINE_WIDTH))
+    print('L %d %d %d %d 3 %d 1 0 -1 -1' % (PIN_LENGTH, 200 + (n + 1) * PIN_SPACE, PIN_LENGTH + add_width + main_width + add_width, 200 + (n + 1) * PIN_SPACE, THICK_LINE_WIDTH))
     # name
     print('T %d %d 9 %d 1 0 0 4 1' % (PIN_LENGTH + (add_width + main_width + add_width) / 2, 200 + n * PIN_SPACE, TEXT_SIZE))
     print('%s' % designation)
 
     """
-    NAME[/|\|*][:PINNUM]
-    ~NAME
-    -
+    - separator
+    ~NAME label only
+    NAME[type][:PINNUM]
+    NAME in(left)/out(right)
+    NAME^ out(left)/in(right)
+    NAME* pwr
+    NAME~ io
+    NAME# tristate
+    NAME- inverted
+    NAME/ posedge
+    NAME\ negedge
     """
     pinseq = 0
     # left side: inputs
@@ -96,7 +104,7 @@ def main():
             pinlabel = pinlabel.rstrip('\\')
             pintype = '\\'
         if pinlabel == '' and pintype == '-':
-            print('L %d %d %d %d 3 %d 0 0 -1 -1' % (x, y, x + add_width, y, THIN_LINE_WIDTH))
+            print('L %d %d %d %d 3 %d 1 0 -1 -1' % (x, y, x + add_width, y, THIN_LINE_WIDTH))
             continue
         if pinlabel.startswith('~'):
             print('T %d %d 9 %d 1 0 0 4 1' % (PIN_LENGTH + (add_width) / 2, y, TEXT_SIZE))
@@ -174,7 +182,7 @@ def main():
             pinlabel = pinlabel.rstrip('\\')
             pintype = '\\'
         if pinlabel == '' and pintype == '-':
-            print('L %d %d %d %d 3 %d 0 0 -1 -1' % (x - add_width, y, x, y, THIN_LINE_WIDTH))
+            print('L %d %d %d %d 3 %d 1 0 -1 -1' % (x - add_width, y, x, y, THIN_LINE_WIDTH))
             continue
         if pinlabel.startswith('~'):
             print('T %d %d 9 %d 1 0 0 4 1' % (PIN_LENGTH + add_width + main_width + add_width / 2, y, TEXT_SIZE))
@@ -205,9 +213,9 @@ def main():
         if pintype == '-':
             print('V %d %d %d 6 0 1 0 -1 -1 0 -1 -1 -1 -1 -1' % (x, y, RADIUS))
         if pintype == '/' or pintype == '*':
-            print('L %d %d %d %d 3 %d 0 0 -1 -1' % (x - RADIUS, y - RADIUS, x + RADIUS, y + RADIUS, THIN_LINE_WIDTH))
+            print('L %d %d %d %d 3 %d 1 0 -1 -1' % (x - RADIUS, y - RADIUS, x + RADIUS, y + RADIUS, THIN_LINE_WIDTH))
         if pintype == '\\' or pintype == '*':
-            print('L %d %d %d %d 3 %d 0 0 -1 -1' % (x - RADIUS, y + RADIUS, x + RADIUS, y - RADIUS, THIN_LINE_WIDTH))
+            print('L %d %d %d %d 3 %d 1 0 -1 -1' % (x - RADIUS, y + RADIUS, x + RADIUS, y - RADIUS, THIN_LINE_WIDTH))
 
     # attributes
     x = PIN_LENGTH + add_width + main_width / 2
